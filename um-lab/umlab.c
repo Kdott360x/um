@@ -49,7 +49,10 @@ static inline Um_instruction add(Um_register a, Um_register b, Um_register c)
         return three_register(ADD, a, b, c);
 }
 
-Um_instruction output(Um_register c);
+Um_instruction output(Um_register c)
+{
+        return three_register(OUT, 0, 0, c);
+}
 
 /* Functions for working with streams */
 
