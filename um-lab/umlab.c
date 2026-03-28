@@ -100,6 +100,20 @@ void build_verbose_halt_test(Seq_T stream)
         append(stream, output(r1));
 }
 
+void build_add_halt_test(Seq_T stream)
+{
+        append(stream, add(r1, r2, r3));
+        append(stream, halt());
+}
+
+void build_print_six_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 48));
+        append(stream, loadval(r2, 6));
+        append(stream, add(r3, r1, r2));
+        append(stream, output(r3));
+        append(stream, halt());
+}
 
 Um_instruction three_register(Um_opcode op, int ra, int rb, int rc)
 {
