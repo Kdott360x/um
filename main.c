@@ -10,3 +10,36 @@
  *  most of the work onward to um.c
 
  */
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "segments.h"
+
+int main(int argc, char *argv[])
+{
+        if (argc != 2) {
+                fprintf(stderr, "Usage: ./um program.um\n");
+                return EXIT_FAILURE;
+        }
+
+        FILE *fp = fopen(argv[1], "rb");
+        if (fp == NULL) {
+                fprintf(stderr, "Could not open file: %s\n", argv[1]);
+                return EXIT_FAILURE;
+        }
+
+        Segment_T program = Segment_read_file(fp);
+        fclose(fp);
+
+        if (program == NULL) {
+                fprintf(stderr, "Failed to load program: %s\n", argv[1]);
+                return EXIT_FAILURE;
+        }
+
+        // UM_T um = UM_new(program);
+
+        // UM_run(um);
+        // UM_free(&um);
+
+        return EXIT_SUCCESS;
+}

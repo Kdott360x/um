@@ -16,3 +16,16 @@
  *  duplicating a segment for the load-program instruction.
  * 
  */
+
+#ifndef SEGMENTS_H
+#define SEGMENTS_H
+
+#include <stdio.h>
+#include <stdint.h>
+
+typedef struct Segment *Segment_T;
+
+//Segment_T Segment_read_file(FILE *fp);
+//void Segment_free(Segment_T *segment);
+
+#endif
