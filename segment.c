@@ -34,8 +34,8 @@
         assert(seg != NULL);
 
         // init values of segment_t
-        uint32_t cap = 16;
-        seg->words = malloc(16 * sizeof(uint32_t));
+        uint32_t cap = 1;
+        seg->words = malloc(1 * sizeof(uint32_t));
         assert(seg->words != NULL);
         seg->length = 0;
 
