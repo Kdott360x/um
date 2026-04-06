@@ -14,6 +14,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// Segment_T Segment_new(uint32_t length);
+// void Segment_free(Segment_T *seg);
+// uint32_t Segment_length(Segment_T seg);
+// uint32_t Segment_get(Segment_T seg, uint32_t index);
+// void Segment_put(Segment_T seg, uint32_t index, uint32_t value);
+// Segment_T Segment_read_file(FILE *fp);
+
 
  Segment_T Segment_read_file(FILE *fp)
  {
