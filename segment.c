@@ -13,6 +13,8 @@
 #include "assert.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <iso646.h>
 
 // Segment_T Segment_new(uint32_t length);
 // void Segment_free(Segment_T *seg);
@@ -38,18 +40,18 @@
         seg->length = 0;
 
         // read binary file in 32bit segments
-        while(1){
+        while(true) {
                 int b0 = fgetc(fp);
-                if (b0 == EOF){
+                if (b0 == EOF) {
                         break;
                 }
                 int b1 = fgetc(fp);
                 int b2 = fgetc(fp);
                 int b3 = fgetc(fp);
-                assert(b0 != EOF && b1 != EOF && b2 != EOF && b3 != EOF);
+                assert(b0 != EOF and b1 != EOF and b2 != EOF and b3 != EOF);
 
                 // check capacity for space, if max realloc
-                if (cap == seg->length){
+                if (cap == seg->length) {
                         cap = cap * 2;
                         seg->words = realloc(seg->words, 
                                                 cap * sizeof(uint32_t));
