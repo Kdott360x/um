@@ -12,8 +12,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "segments.h"
+#include "segment.h"
 
 int main(int argc, char *argv[])
 {
@@ -36,6 +35,9 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
+        if (program != NULL) {
+                printf("something here\n");
+        }
         // UM_T um = UM_new(program);
 
         // UM_run(um);

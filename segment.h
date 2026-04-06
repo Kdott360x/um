@@ -23,9 +23,19 @@
 #include <stdio.h>
 #include <stdint.h>
 
-typedef struct Segment *Segment_T;
+/* Segment_T
+ * Representation: a pointer to a struct containing a uint32_t length
+ *                 and a uint32_t *words array.
+ * Meaning: represents one mapped UM memory segment, where words points
+ *          to a dynamically allocated sequence of 32-bit words and
+ *          length gives the number of words in that segment.
+ */
+typedef struct Segment {
+    uint32_t length;
+    uint32_t *words;
+} *Segment_T;
 
-//Segment_T Segment_read_file(FILE *fp);
+Segment_T Segment_read_file(FILE *fp);
 //void Segment_free(Segment_T *segment);
 
 #endif
