@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "segment.h"
+#include <stdint.h>
+#include <inttypes.h>
 
 int main(int argc, char *argv[])
 {
@@ -35,8 +37,11 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
-        if (program != NULL) {
-                printf("something here\n");
+        printf("program loaded successfully\n");
+        printf("length: %" PRIu32 "\n", program->length);
+
+        for (uint32_t i = 0; i < program->length; i++) {
+                printf("%08" PRIx32 "\n", program->words[i]);
         }
         // UM_T um = UM_new(program);
 
