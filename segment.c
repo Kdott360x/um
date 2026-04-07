@@ -16,8 +16,6 @@
 #include <stdbool.h>
 #include <iso646.h>
 
-// uint32_t Segment_length(Segment_T seg);
-// uint32_t Segment_get(Segment_T seg, uint32_t index);
 // void Segment_put(Segment_T seg, uint32_t index, uint32_t value);
 
 
@@ -150,6 +148,34 @@ uint32_t Segment_length(Segment_T seg)
 {
         assert(seg != NULL);
         return seg->length;
+}
+
+/****** Segment_get ********
+ *
+ * Return the value held within the given segment at the given index.
+ *
+ * Params:
+ *      Segment_T *seg: address of the segment
+ *      uint32_t index: the index of the value we are looking to return
+ *
+ * Return:
+ *      uint32_t which is the word we are indexing for.
+ *
+ * Expects:
+ *       The given index is within range of the words array. 
+ *      Expects seg is not null and is a valid Segment_T struct.
+ * 
+ * Notes: 
+ * 
+ *       Will CRE if segment is null, if index is not within range.
+ *
+ ************************/
+uint32_t Segment_get(Segment_T seg, uint32_t index)
+{
+        assert(seg != NULL);
+        assert(index < seg->length);
+        assert(index > -1);
+        return seg->words[index];
 }
 
 /****** Segment_free ********
