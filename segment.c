@@ -16,15 +16,38 @@
 #include <stdbool.h>
 #include <iso646.h>
 
-// Segment_T Segment_new(uint32_t length);
 // void Segment_free(Segment_T *seg);
 // uint32_t Segment_length(Segment_T seg);
 // uint32_t Segment_get(Segment_T seg, uint32_t index);
 // void Segment_put(Segment_T seg, uint32_t index, uint32_t value);
-// Segment_T Segment_read_file(FILE *fp);
 
 
-
+/****** Segment_new ****
+ *
+ * Creates a new segment containing the given number of 32-bit words,
+ * with every word initialized to 0.
+ *
+ * Params:
+ *      uint32_t length: number of words the segment should contain
+ *  
+ * Return:
+ *      Segment_T seg: a newly allocated segment whose length field is set
+ *      to length and whose words array has length elements, all set to 0
+ * 
+ * Expects:
+ *      uint32_t length is a valid length when converted to int.
+ * 
+ * Notes:
+ *      Allocates memory for both the segment struct itself and its words
+ *      array.
+ *
+ *      If length is 0, the segment still exists, but its words array does
+ *      not need to store any elements.
+ *
+ *      This function is useful for creating newly mapped UM segments, since
+ *      the UM spec requires that all words in a new segment begin as 0.
+ *
+ ************************/
 Segment_T Segment_new(uint32_t length)
 {
         Segment_T seg = malloc(sizeof(*seg));
@@ -41,7 +64,27 @@ Segment_T Segment_new(uint32_t length)
         return seg;
 }
 
-
+/****** Segment_read_file ****
+ *
+ * Takes in the input file and parses it into an array of uint32_t commands
+ * stored in the form of a segment_T struct that contains the length of the 
+ * wordsd array and also a pointer to the beginning of that words array.
+ *
+ * Params:
+ *      FILE *fp: pointer to the input file
+ *  
+ * Return:
+ *      Segment_T seg: this contians the pointer to an array of words and an
+ *                      int that represents the length of the array.
+ * 
+ * Expects:
+ *      Input file is the correct input file and contains a number of bits 
+ *      divisible by 32. 
+ * 
+ * Notes:
+ *      Will CRE if EOF is not adjacent to a multiple of 32.
+ *
+ ************************/
  Segment_T Segment_read_file(FILE *fp)
  {
         // check file nullity
@@ -89,3 +132,32 @@ Segment_T Segment_new(uint32_t length)
         }
         return seg;
  }
+
+/****** Segment_free ********
+ *
+ * Frees all memory associated with a segment and sets the caller's
+ * pointer to NULL.
+ *
+ * Params:
+ *      Segment_T *seg: address of the segment pointer to free
+ *
+ * Return:
+ *      None
+ *
+ * Notes:
+ *      Frees both the words array inside the segment and the segment
+ *      struct itself.
+ *
+ *      After freeing, *seg is set to NULL to avoid leaving a dangling
+ *      pointer.
+ *
+ ************************/
+void Segment_free(Segment_T *seg)
+{
+        assert(seg != NULL);
+        assert(*seg != NULL);
+
+        free((*seg)->words);
+        free(*seg);
+        *seg = NULL;
+}
