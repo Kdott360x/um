@@ -15,6 +15,7 @@
 #include "segment.h"
 #include <stdint.h>
 #include <inttypes.h>
+#include "um.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,6 +44,8 @@ int main(int argc, char *argv[])
         for (uint32_t i = 0; i < program->length; i++) {
                 printf("%08" PRIx32 "\n", program->words[i]);
         }
+
+
         // UM_T um = UM_new(program);
 
         // UM_run(um);

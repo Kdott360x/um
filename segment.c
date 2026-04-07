@@ -16,7 +16,16 @@
 #include <stdbool.h>
 #include <iso646.h>
 
+
 // void Segment_put(Segment_T seg, uint32_t index, uint32_t value);
+
+void Segment_put(Segment_T seg, uint32_t index, uint32_t value)
+{
+        assert(seg != NULL);
+        assert(index < seg->length);
+
+        seg->words[index] = value;
+}
 
 
 /****** Segment_new ****
@@ -93,7 +102,7 @@ Segment_T Segment_new(uint32_t length)
 
         // init values of segment_t
         uint32_t cap = 1;
-        seg->words = malloc(1 * sizeof(uint32_t));
+        seg->words = malloc(cap * sizeof(uint32_t));
         assert(seg->words != NULL);
         seg->length = 0;
 
@@ -174,7 +183,6 @@ uint32_t Segment_get(Segment_T seg, uint32_t index)
 {
         assert(seg != NULL);
         assert(index < seg->length);
-        assert(index > -1);
         return seg->words[index];
 }
 
