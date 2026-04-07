@@ -16,7 +16,6 @@
 #include <stdbool.h>
 #include <iso646.h>
 
-// void Segment_free(Segment_T *seg);
 // uint32_t Segment_length(Segment_T seg);
 // uint32_t Segment_get(Segment_T seg, uint32_t index);
 // void Segment_put(Segment_T seg, uint32_t index, uint32_t value);
@@ -132,6 +131,26 @@ Segment_T Segment_new(uint32_t length)
         }
         return seg;
  }
+
+/****** Segment_length ********
+ *
+ * Returns the number of words contained in the given segment.
+ *
+ * Params:
+ *      Segment_T seg: the segment whose length is being queried
+ *
+ * Return:
+ *      uint32_t: the number of words in the segment
+ *
+ * Notes:
+ *      The segment must not be NULL.
+ *
+ ************************/
+uint32_t Segment_length(Segment_T seg)
+{
+        assert(seg != NULL);
+        return seg->length;
+}
 
 /****** Segment_free ********
  *
