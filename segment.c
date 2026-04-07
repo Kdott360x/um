@@ -24,6 +24,24 @@
 // Segment_T Segment_read_file(FILE *fp);
 
 
+
+Segment_T Segment_new(uint32_t length)
+{
+        Segment_T seg = malloc(sizeof(*seg));
+        assert(seg != NULL);
+
+        seg->length = length;
+        seg->words = malloc(length * sizeof(uint32_t));
+        assert(seg->words != NULL || length == 0);
+
+        for (uint32_t i = 0; i < length; i++) {
+                seg->words[i] = 0;
+        }
+
+        return seg;
+}
+
+
  Segment_T Segment_read_file(FILE *fp)
  {
         // check file nullity
