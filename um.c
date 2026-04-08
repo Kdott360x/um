@@ -36,25 +36,36 @@ UM_T UM_new(Segment_T seg_zero)
 {
         assert(seg_zero != NULL);
 
+        // get space for the um pointer
         UM_T um = malloc(sizeof(*um));
+        assert(um != NULL);
 
+        // set the program pointer to seg_zero
         um->program = seg_zero;
 
+        // init registers
         for (int i = 0; i < 8; i++) {
                 um->regs[i] = 0;
         }
+
+        //init the counter
         um->program_counter = 0;    		
 
-        // the segments array is a an array that points to pointers to a
-        // Segment_T struct
-        um->segments = malloc(sizeof(*um->segments));
+        // allocate array of 1 Segment_T pointer
+        um->segments = malloc(sizeof(*um->segments) * 1);
         assert(um->segments != NULL);
 
+        // store segment 0
+        um->segments[0] = seg_zero;
+
+        // init segment capacity to 1
         um->seg_capacity = 1;	
         // NOTE: Can do individual add ns if time is inefficient
 
+        // initialize the unmapped sequence
         um->unmapped = Seq_new(1000);	
 
+        // return the pointer
         return um;	           			
 }
 
@@ -79,16 +90,17 @@ UM_T UM_new(Segment_T seg_zero)
  ************************/
 void UM_run(UM_T um) 
 {
+        (void) um;
         bool program_is_running = true;
         while (program_is_running) {
-                // find the value that the program counter points to
-                uint32_t curr_instruction = um->segments[0][um->program_counter];
+                // // find the value that the program counter points to
+                // uint32_t curr_instruction = um->segments[0][um->program_counter];
 
-                // pass this value (u_int32) into our instruction function
-                program_is_running = run_instruction(curr_instruction);
+                // // pass this value (u_int32) into our instruction function
+                // program_is_running = run_instruction(curr_instruction);
 
-                // increment the program counter
-                um->program_counter++;
+                // // increment the program counter
+                // um->program_counter++;
         }
 }
 
@@ -111,23 +123,23 @@ void UM_run(UM_T um)
  *      Will CRE if the UM is Null or invalid 
  *
  ************************/
-void UM_free(UM_T um) 
-{
-        assert(um != NULL);
-        um->program = NULL;
+// void UM_free(UM_T um) 
+// {
+//         assert(um != NULL);
+//         um->program = NULL;
 
-        for (int i = 0; i < 8; i++) {
-                regs[i] = 0;
-        }
+//         for (int i = 0; i < 8; i++) {
+//                 regs[i] = 0;
+//         }
 
-        for (int i = 0; i < (um->segments.size()); i++) {
-                Segment_free(*(um->segments[i]));
-                *(um->segments[i]) = NULL;
-        }
-        free(um->segments);
+//         for (int i = 0; i < (um->segments.size()); i++) {
+//                 Segment_free(*(um->segments[i]));
+//                 *(um->segments[i]) = NULL;
+//         }
+//         free(um->segments);
 
-        Seq_free(um->unmapped);	
+//         Seq_free(um->unmapped);	
 
-        free(*um);	
-        um = NULL;           			
-}
+//         free(*um);	
+//         um = NULL;           			
+// }
