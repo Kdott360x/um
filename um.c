@@ -28,10 +28,10 @@
  *      Will CRE if the Segment is Null or invalid 
  *
  ************************/
-UM_T UM_new(Segment_T segmentZero) 
+UM_T UM_new(Segment_T seg_zero) 
 {
-        assert(segmentZero != NULL);
-        um->program = segmentZero;
+        assert(seg_zero != NULL);
+        um->program = seg_zero;
 
         UM_T um = malloc(size_of(*UM_T));
         for (int i = 0; i < 8; i++) {
