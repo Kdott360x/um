@@ -93,14 +93,15 @@ void UM_run(UM_T um)
         (void) um;
         bool program_is_running = true;
         while (program_is_running) {
-                // // find the value that the program counter points to
-                // uint32_t curr_instruction = um->segments[0][um->program_counter];
+                // find the value that the program counter points to
+                uint32_t curr_instruction = segment_get(um->segments[0], 
+                                                um->program_counter);
 
-                // // pass this value (u_int32) into our instruction function
-                // program_is_running = run_instruction(curr_instruction);
+                // pass this value (u_int32) into our instruction function
+                program_is_running = run_instruction(um, curr_instruction);
 
-                // // increment the program counter
-                // um->program_counter++;
+                // increment the program counter
+                um->program_counter++;
         }
 }
 
