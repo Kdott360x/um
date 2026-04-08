@@ -68,13 +68,13 @@ UM_T UM_new(Segment_T segmentZero)
  *
  ************************/
 void UM_run(UM_T um) {
-        bool programRunning = true;
-        while (programRunning) {
+        bool program_isrunning = true;
+        while (program_isrunning) {
                 // find the value that the program counter points to
-                uint32_t currentInstruction = um->segments[0][program_counter];
+                uint32_t curr_instruction = um->segments[0][um->program_counter];
 
                 // pass this value (u_int32) into our instruction function
-                runInstruction(currentInstruction);
+                run_instruction(curr_instruction);
 
                 // increment the program counter
                 um->program_counter++;
