@@ -47,7 +47,9 @@ UM_T UM_new(Segment_T seg_zero)
 
         // the segments array is a an array that points to pointers to a
         // Segment_T struct
-        um->segments = malloc(sizeof(*seg_zero));
+        um->segments = malloc(sizeof(*um->segments));
+        assert(um->segments != NULL);
+
         um->seg_capacity = 1;	
         // NOTE: Can do individual add ns if time is inefficient
 
