@@ -10,6 +10,10 @@
  */
 
 
+#include "um.h"
+
+
+
  /****** UM_new ****
  *
  * Creates a new UM struct.
@@ -31,21 +35,25 @@
 UM_T UM_new(Segment_T seg_zero) 
 {
         assert(seg_zero != NULL);
+
+        UM_T um = malloc(sizeof(*um));
+
         um->program = seg_zero;
 
-        UM_T um = malloc(size_of(*UM_T));
         for (int i = 0; i < 8; i++) {
-                regs[i] = 0;
+                um->regs[i] = 0;
         }
         um->program_counter = 0;    		
 
         // the segments array is a an array that points to pointers to a
         // Segment_T struct
-        um->segments = malloc(size_of(*Segment_T));
+        um->segments = malloc(sizeof(*seg_zero));
         um->seg_capacity = 1;	
         // NOTE: Can do individual add ns if time is inefficient
 
-        um->unmapped = Seq_new(1000);		           			
+        um->unmapped = Seq_new(1000);	
+
+        return um;	           			
 }
 
 
@@ -67,16 +75,57 @@ UM_T UM_new(Segment_T seg_zero)
  *      Will CRE if the UM is Null or invalid 
  *
  ************************/
-void UM_run(UM_T um) {
-        bool program_isrunning = true;
-        while (program_isrunning) {
+void UM_run(UM_T um) 
+{
+        bool program_is_running = true;
+        while (program_is_running) {
                 // find the value that the program counter points to
                 uint32_t curr_instruction = um->segments[0][um->program_counter];
 
                 // pass this value (u_int32) into our instruction function
-                run_instruction(curr_instruction);
+                program_is_running = run_instruction(curr_instruction);
 
                 // increment the program counter
                 um->program_counter++;
         }
+}
+
+
+ /****** UM_free ****
+ *
+ * Frees the UM struct.
+ *
+ * Params:
+ *      UM_T um: This is the UM containing the commands and registers that will
+ *      be used to run our program.
+ *  
+ * Return:
+ *      nothing
+ * 
+ * Expects:
+ *      UM_T is not null or invalid
+ * 
+ * Notes:
+ *      Will CRE if the UM is Null or invalid 
+ *
+ ************************/
+void UM_free(UM_T um) 
+{
+        assert(um != NULL);
+        um->program = NULL;
+
+        for (int i = 0; i < 8; i++) {
+                regs[i] = 0;
+        }
+
+        for (int i = 0; i < (um->segments.size()); i++) {
+                Segment_free(*(um->segments[i]));
+                *(um->segments[i]) = NULL;
+        }
+        free(um->segments);
+
+        Seq_free(um->unmapped);	
+
+        free(*um);	
+        um = NULL;           			
 }

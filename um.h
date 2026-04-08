@@ -37,3 +37,6 @@ typedef struct UM {
 // uint32_t move_program_controller
 
 UM_T UM_new(Segment_T segmentZero);
+void UM_run(UM_T um);
+void UM_free(Segment_T seg_zero);
+
