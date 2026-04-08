@@ -8,3 +8,11 @@
  * Implementation of the instructions.h file.
  * 
  */
+
+
+
+
+ // HUGE NOTE!!! For the instruction that jumps to a line of code, jump to the 
+ // line of code minus... we are  aware that we are subtracting from
+ // zero for unsigned ints, and we are aware this wraps around, but when
+ // we add one to the program counter it will work anyway.

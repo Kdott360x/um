@@ -23,7 +23,7 @@
 
 typedef struct UM {
         uint32_t regs[8];			// 8 registers
-        uint32_t program_controller;    		// program controller
+        uint32_t program_counter;    		// program controller
 
         Segment_T *segments;		        // mapped segments
         uint32_t seg_capacity;		
@@ -35,3 +35,5 @@ typedef struct UM {
 
 
 // uint32_t move_program_controller
+
+UM_T UM_new(Segment_T segmentZero);

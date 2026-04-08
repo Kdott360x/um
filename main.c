@@ -30,13 +30,14 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
-        Segment_T program = Segment_read_file(fp);
+        Segment_T segmentZero = Segment_read_file(fp);
         fclose(fp);
 
-        if (program == NULL) {
+        if (segmentZero == NULL) {
                 fprintf(stderr, "Failed to load program: %s\n", argv[1]);
                 return EXIT_FAILURE;
         }
+        
 
         printf("program loaded successfully\n");
         printf("length: %" PRIu32 "\n", program->length);

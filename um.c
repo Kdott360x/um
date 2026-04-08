@@ -8,3 +8,75 @@
  *  Implementaion of the um.h file
  * 
  */
+
+
+ /****** UM_new ****
+ *
+ * Creates a new UM struct.
+ *
+ * Params:
+ *      Segment_T segmentZero: This is the segment containing all of the 
+ *      commands
+ *  
+ * Return:
+ *      Returns a pointer to a UM_T struct that will be used for the run command
+ * 
+ * Expects:
+ *      Segment_T is not null and is a pointer to a valid Segment_T
+ * 
+ * Notes:
+ *      Will CRE if the Segment is Null or invalid 
+ *
+ ************************/
+UM_T UM_new(Segment_T segmentZero) 
+{
+        assert(segmentZero != NULL);
+        um->program = segmentZero;
+
+        UM_T um = malloc(size_of(*UM_T));
+        for (int i = 0; i < 8; i++) {
+                regs[i] = 0;
+        }
+        um->program_counter = 0;    		
+
+        // the segments array is a an array that points to pointers to a
+        // Segment_T struct
+        um->segments = malloc(size_of(*Segment_T));
+        um->seg_capacity = 1;	
+        // NOTE: Can do individual add ns if time is inefficient
+
+        um->unmapped = Seq_new(1000);		           			
+}
+
+
+ /****** UM_run ****
+ *
+ * Runs the UM struct through the UM program.
+ *
+ * Params:
+ *      UM_T um: This is the UM containing the commands and registers that will
+ *      be used to run our program.
+ *  
+ * Return:
+ *      nothing
+ * 
+ * Expects:
+ *      UM_T is not null or invalid
+ * 
+ * Notes:
+ *      Will CRE if the UM is Null or invalid 
+ *
+ ************************/
+void UM_run(UM_T um) {
+        bool programRunning = true;
+        while (programRunning) {
+                // find the value that the program counter points to
+                uint32_t currentInstruction = um->segments[0][program_counter];
+
+                // pass this value (u_int32) into our instruction function
+                runInstruction(currentInstruction);
+
+                // increment the program counter
+                um->program_counter++;
+        }
+}
