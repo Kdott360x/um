@@ -90,18 +90,20 @@ UM_T UM_new(Segment_T seg_zero)
  ************************/
 void UM_run(UM_T um) 
 {
-        (void) um;
-        bool program_is_running = true;
-        while (program_is_running) {
-                // find the value that the program counter points to
-                uint32_t curr_instruction = segment_get(um->segments[0], 
-                                                um->program_counter);
+        assert(um != NULL);
+        assert(um->program != NULL);
 
-                // pass this value (u_int32) into our instruction function
+        bool program_is_running = true;
+
+        while (program_is_running) {
+                uint32_t curr_instruction =
+                        Segment_get(um->program, um->program_counter);
+
+                um->program_counter++;
+
                 program_is_running = run_instruction(um, curr_instruction);
 
-                // increment the program counter
-                um->program_counter++;
+                um->program = um->segments[0];
         }
 }
 
@@ -124,23 +126,20 @@ void UM_run(UM_T um)
  *      Will CRE if the UM is Null or invalid 
  *
  ************************/
-// void UM_free(UM_T um) 
-// {
-//         assert(um != NULL);
-//         um->program = NULL;
+void UM_free(UM_T *um) 
+{
+        assert(um != NULL);
+        assert(*um != NULL);
 
-//         for (int i = 0; i < 8; i++) {
-//                 regs[i] = 0;
-//         }
+        for (uint32_t i = 0; i < (*um)->seg_capacity; i++) {
+                if ((*um)->segments[i] != NULL) {
+                        Segment_free(&((*um)->segments[i]));
+                }
+        }
 
-//         for (int i = 0; i < (um->segments.size()); i++) {
-//                 Segment_free(*(um->segments[i]));
-//                 *(um->segments[i]) = NULL;
-//         }
-//         free(um->segments);
+        free((*um)->segments);
+        Seq_free(&((*um)->unmapped));
 
-//         Seq_free(um->unmapped);	
-
-//         free(*um);	
-//         um = NULL;           			
-// }
+        free(*um);
+        *um = NULL;
+}

@@ -38,5 +38,5 @@ typedef struct UM {
 
 UM_T UM_new(Segment_T segmentZero);
 void UM_run(UM_T um);
-void UM_free(Segment_T seg_zero);
+void UM_free(UM_T *um);
 

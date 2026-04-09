@@ -13,3 +13,16 @@
  * segmented memory.
  * 
  */
+
+#ifndef INSTRUCTIONS_H
+#define INSTRUCTIONS_H
+
+#include <stdint.h>
+#include <stdbool.h>
+
+// declare the UM struct we are using
+typedef struct UM *UM_T;
+
+bool run_instruction(UM_T um, uint32_t instruction);
+
+#endif
