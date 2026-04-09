@@ -12,6 +12,9 @@
  * 
  */
 
+#ifndef UM_H
+#define UM_H
+
 #include "segment.h"
 #include "assert.h"
 #include <stdint.h>
@@ -40,3 +43,4 @@ UM_T UM_new(Segment_T segmentZero);
 void UM_run(UM_T um);
 void UM_free(UM_T *um);
 
+#endif

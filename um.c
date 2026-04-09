@@ -11,6 +11,7 @@
 
 
 #include "um.h"
+#include "instructions.h"
 
 
 

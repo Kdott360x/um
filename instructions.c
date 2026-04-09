@@ -55,7 +55,17 @@ bool run_instruction(UM_T um, uint32_t instruction)
         uint32_t opcode = get_opcode(instruction);
 
         // check for op 13
+        if (opcode = 13) {
+                // find register
 
+                // find value
+
+                // put val in register
+        
+
+
+                return true;
+        }
         //set the registers vefore getting into the code
 
         // the rest of hte swtich cases
