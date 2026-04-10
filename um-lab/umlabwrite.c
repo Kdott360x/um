@@ -22,6 +22,7 @@ extern void build_div_test(Seq_T instructions);
 extern void build_nand_test(Seq_T instructions);
 extern void build_seg_store_load_zero_test(Seq_T instructions);
 extern void build_map_store_load_unmap_test(Seq_T instructions);
+extern void build_50m_loop_test(Seq_T instructions);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -37,6 +38,8 @@ static struct test_info {
         { "add-halt", NULL, "", build_add_halt_test },
         { "print-six", NULL, "6", build_print_six_test },
 
+        { "loop50m", NULL, "", build_50m_loop_test },   
+
         { "input-output",         "Q",  "Q", build_input_output_test },
         { "cmov-zero",            NULL, "A", build_cmov_zero_test },
         { "cmov-nonzero",         NULL, "B", build_cmov_nonzero_test },
@@ -45,6 +48,7 @@ static struct test_info {
         { "nand-zero",            NULL, "0", build_nand_test },
         { "seg-store-load-zero",  NULL, "Z", build_seg_store_load_zero_test },
         { "map-store-load-unmap", NULL, "M", build_map_store_load_unmap_test },
+
 };
 
   

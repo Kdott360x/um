@@ -99,6 +99,11 @@ static inline Um_instruction unmap_segment(Um_register c)
         return three_register(INACTIVATE, 0, 0, c);
 }
 
+static inline Um_instruction load_program(Um_register b, Um_register c)
+{
+        return three_register(LOADP, 0, b, c);
+}
+
 /* END Wrapper functions for each of the instructions */
 
 /* Functions for working with streams */
@@ -198,6 +203,19 @@ Um_instruction loadval(unsigned ra, unsigned val)
         myInstruction = myInstruction | ((Um_instruction)val);
 
         return myInstruction;
+}
+
+void build_50m_loop_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 12499999));
+        append(stream, nand(r3, r0, r0)); 
+        append(stream, loadval(r6, 3));
+
+        append(stream, add(r1, r1, r3));         
+        append(stream, loadval(r5, 7));
+        append(stream, cmov(r5, r6, r1));
+        append(stream, load_program(r0, r5));
+        append(stream, halt());
 }
 
 void build_input_output_test(Seq_T stream)

@@ -88,11 +88,18 @@ instructions.c: 	Execute all operations given solely a word
        
      
 
-
-
-
 – Explains how long it takes your UM to execute 50 million instructions, and 
 how you know
+
+
+Our UM executes 50 million instructions in about 0.59 seconds. We
+measured this by running cpu-limited 120 /usr/bin/time ./um um-lab/loop50m.um >
+ /dev/null. We know it executes exactly 50,000,000 instructions because
+we built the test as a fixed loop with a known count. There are 3 setup
+instructions before the loop, 4 instructions in each loop iteration, and
+1 final halt instruction, so the total number of instructions is 4N + 4.
+We set N to 12,499,999, so 4(12,499,999) + 4 = 50,000,000.
+
 
 – Mentions each UM unit test (from UMTESTS) by name, explaining what each one 
 tests and how
