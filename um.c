@@ -9,7 +9,6 @@
  * 
  */
 
-
 #include "um.h"
 #include "instructions.h"
 
@@ -107,10 +106,6 @@ void UM_run(UM_T um)
                 program_is_running = run_instruction(um, curr_instruction);
 
                 um->program = um->segments[0];
-
-                // print_um_state(um);
-                // printf("\n\n");
-                // wake up
         }
 }
 
@@ -149,25 +144,6 @@ void UM_free(UM_T *um)
 
         free(*um);
         *um = NULL;
-}
-
-
-void print_um_state(UM_T um)
-{
-        printf("\n\n");
-        printf("Registers\n");
-        for (int i = 0; i < 8; i++) {
-                printf("%d\n", um->regs[i]);
-        }
-
-        printf("Program Counter: ");
-        printf("%d\n", um->program_counter);
-
-        printf("Segment Count: ");
-        printf("%d\n", um->seg_size);
-
-        printf("Segment Cap: ");
-        printf("%d\n", um->seg_capacity);
 }
 
 

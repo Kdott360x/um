@@ -30,26 +30,18 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
+        // set segment 0
         Segment_T segment_zero = Segment_read_file(fp);
         fclose(fp);
         if (segment_zero == NULL) {
                 fprintf(stderr, "Failed to load program: %s\n", argv[1]);
                 return EXIT_FAILURE;
         }
-        // run the UM_run command with the segmentZero
-        // NOTE: do we need to free segment zero?  
 
-
-        // printf("program loaded successfully\n");
-        // printf("length: %" PRIu32 "\n", program->length);
-
-        // for (uint32_t i = 0; i < program->length; i++) {
-        //         printf("%08" PRIx32 "\n", program->words[i]);
-        // }
-
-
+        // create the UM
         UM_T um = UM_new(segment_zero);
 
+        // Run it then free it
         UM_run(um);
         UM_free(&um);
 
