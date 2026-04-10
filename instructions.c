@@ -5,17 +5,12 @@
  *
  *  CS 40 Project 6: um
  *
- * Implementation of the instructions.h file.
+ * File takes in a uint32_t word from the UM which contains an operation 
+ * command and the given register indexes and potential values that we need 
+ * to perform the operation. File takes this word and determines what actions
+ * to complete.
  * 
  */
-
-
-
-
- // HUGE NOTE!!! For the instruction that jumps to a line of code, jump to the 
- // line of code minus... we are  aware that we are subtracting from
- // zero for unsigned ints, and we are aware this wraps around, but when
- // we add one to the program counter it will work anyway.
 
 #include "instructions.h"
 #include "um.h"
@@ -33,6 +28,7 @@ static inline uint32_t get_ra(uint32_t word);
 static inline uint32_t get_rb(uint32_t word);
 static inline uint32_t get_rc(uint32_t word);
 
+// operation helpers, also static
 static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
 static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
 static void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
@@ -46,11 +42,39 @@ static void output(UM_T um, uint32_t rc);
 static void input(UM_T um, uint32_t rc);
 static void load_program(UM_T um, uint32_t rb, uint32_t rc);
 
-
+/****** run_instruction ********
+ *
+ * Parses the 32bit words to perform the correct operations with the given
+ * registers
+ *
+ * Params:
+ *      UM_T um: the Universal Machine, alter the states of the struct
+ *      uint32_t instruction: the 32-bit instruction word, contains opcode,
+ *                            reg(s), and potentially a value.
+ *
+ * Return:
+ *      Returns true if execution should continue.
+ *      Returns false if the instruction is Halt.
+ *
+ * Expects:
+ *      um is not NULL and instruction is a valid UM instruction word.
+ *
+ * Notes:
+ *      If the opcode is 13, the instruction is treated as a Load Value
+ *      instruction and decoded using its special format.
+ *
+ *      For all other opcodes, the instruction is decoded using the
+ *      standard three-register format and dispatched to the matching
+ *      helper function.
+ *
+ *      Will CRE if um is NULL or if the opcode is invalid.
+ *
+ ************************/
 bool run_instruction(UM_T um, uint32_t instruction)
 {
         assert(um != NULL);
 
+        // get and store opcode
         uint32_t opcode = get_opcode(instruction);
 
         // check for op 13
@@ -67,16 +91,12 @@ bool run_instruction(UM_T um, uint32_t instruction)
                 return true;
         }
 
-
-        //set the registers vefore getting into the code: note use um->regs[reg]
-        // to access the actual value stored, i.e. what is below is the index
+        // set regs
         uint32_t ra = get_ra(instruction);
         uint32_t rb = get_rb(instruction);
         uint32_t rc = get_rc(instruction);
 
-
-
-        // the rest of hte swtich cases
+        // the rest of the swtich cases
         switch (opcode) {
         case 0:
                 conditional_move(um, ra, rb, rc);
@@ -123,27 +143,93 @@ bool run_instruction(UM_T um, uint32_t instruction)
         return true;
 }
 
+/*******
+ * PARSE CODEWORD HELPERS *
+ * ******/
 
-// bit functions
+/****** get_opcode ********
+ *
+ * Extracts and returns the opcode from the given 32-bit instruction word.
+ *
+ * Params:
+ *      uint32_t word: the instruction word to decode
+ *
+ * Return:
+ *      The 4-bit opcode stored in the most significant bits.
+ *
+ ************************/
 static inline uint32_t get_opcode(uint32_t word)
 {
         return word >> 28;
 }
 
+/****** get_ra ********
+ *
+ * Extracts and returns register A from a three-register instruction word.
+ *
+ * Params:
+ *      uint32_t word: the instruction word to decode
+ *
+ * Return:
+ *      The 3-bit register A field from the instruction word.
+ *
+ ************************/
 static inline uint32_t get_ra(uint32_t word)
 {
         return (word >> 6) & 0x7;
 }
+
+/****** get_rb ********
+ *
+ * Extracts and returns register B from a three-register instruction word.
+ *
+ * Params:
+ *      uint32_t word: the instruction word to decode
+ *
+ * Return:
+ *      The 3-bit register B field from the instruction word.
+ *
+ ************************/
 static inline uint32_t get_rb(uint32_t word)
 {
         return (word >> 3) & 0x7;
 }
+
+/****** get_rc ********
+ *
+ * Extracts and returns register C from a three-register instruction word.
+ *
+ * Params:
+ *      uint32_t word: the instruction word to decode
+ *
+ * Return:
+ *      The 3-bit register C field from the instruction word.
+ *
+ ************************/
 static inline uint32_t get_rc(uint32_t word)
 {
         return (word >> 0) & 0x7;
 }
 
-// command functions
+/*******
+ * OPERATION HELPERS *
+ * ******/
+
+/****** conditional_move ********
+ *
+ * If register C is not zero, copies the value in register B into
+ * register A.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose registers are updated
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         if (um->regs[rc] != 0) {
@@ -151,36 +237,137 @@ static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
         }
 }
 
+/****** segmented_load ********
+ *
+ * Loads into register A the word at offset r[C] in segment m[r[B]].
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose state is accessed
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = Segment_get(um->segments[um->regs[rb]], um->regs[rc]);
 }
 
+/****** segmented_store ********
+ *
+ * Stores the value in register C into offset r[B] of segment m[r[A]].
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose state is updated
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         Segment_put(um->segments[um->regs[ra]], um->regs[rb], um->regs[rc]);
 }
 
+/****** add ********
+ *
+ * Stores into register A the sum of registers B and C modulo 2^32.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose registers are updated
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void add(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = (um->regs[rb] + um->regs[rc]);
 }
 
+/****** multiply ********
+ *
+ * Multiplies the values in registers B and C and stores the result in
+ * register A.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose registers are updated
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void multiply(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = (um->regs[rb] * um->regs[rc]);
 }
 
+/****** divide ********
+ *
+ * Divides the value in register B by the value in register C and stores
+ * the result in register A.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose registers are updated
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = (um->regs[rb] / um->regs[rc]);
 }
 
+/****** nand ********
+ *
+ * Computes the bitwise NAND of registers B and C and stores the result
+ * in register A.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose registers are updated
+ *      uint32_t ra: index of register A
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void nand(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = ~(um->regs[rb] & um->regs[rc]);
 }
 
+/****** map_segment ********
+ *
+ * Creates a new segment of length r[C] and stores its identifier in
+ * register B.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose memory is updated
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
 {
         assert(um != NULL);
@@ -208,6 +395,18 @@ static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
         um->regs[rb] = id;
 }
 
+/****** unmap_segment ********
+ *
+ * Unmaps the segment whose identifier is stored in register C.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose memory is updated
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void unmap_segment(UM_T um, uint32_t rc)
 {
         assert(um != NULL);
@@ -223,12 +422,36 @@ static void unmap_segment(UM_T um, uint32_t rc)
         Seq_addlo(um->unmapped, (void *)(uintptr_t)id);
 }
 
+/****** output ********
+ *
+ * Writes the value in register C to standard output as a character.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose register is read
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void output(UM_T um, uint32_t rc)
 {
         uint32_t value = um->regs[rc];
         putchar((char)value);
 }
 
+/****** input ********
+ *
+ * Reads one character from standard input and stores it in register C.
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose register is updated
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void input(UM_T um, uint32_t rc)
 {
         int32_t current = (int32_t)getchar();
@@ -239,6 +462,20 @@ static void input(UM_T um, uint32_t rc)
         }
 }
 
+/****** load_program ********
+ *
+ * Replaces segment 0 with a duplicate of segment m[r[B]] and sets the
+ * program counter to r[C].
+ *
+ * Params:
+ *      UM_T um: the Universal Machine whose program state is updated
+ *      uint32_t rb: index of register B
+ *      uint32_t rc: index of register C
+ *
+ * Return:
+ *      None
+ *
+ ************************/
 static void load_program(UM_T um, uint32_t rb, uint32_t rc)
 {      
         assert(um != NULL);
