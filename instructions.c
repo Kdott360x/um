@@ -22,13 +22,13 @@
 #include <iso646.h>
 
 
-// static helper declarations
+/* PARSE CODEWORD HELPERS -> declarations */ 
 static inline uint32_t get_opcode(uint32_t word);
 static inline uint32_t get_ra(uint32_t word);
 static inline uint32_t get_rb(uint32_t word);
 static inline uint32_t get_rc(uint32_t word);
 
-// operation helpers, also static
+/* OPERATION HELPERS -> declarations */
 static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
 static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
 static void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
