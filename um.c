@@ -12,9 +12,6 @@
 #include "um.h"
 #include "instructions.h"
 
-
-void print_um_state(UM_T um);
-
  /****** UM_new ****
  *
  * Creates a new UM struct.

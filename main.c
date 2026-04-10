@@ -17,6 +17,30 @@
 #include <inttypes.h>
 #include "um.h"
 
+/****** main ********
+ *
+ * Parses the input args, stores given file as segment0,
+ * creates the Universal Machine using segment0, runs the program, and frees all
+ * allocated memory for the UM_T before exiting.
+ *
+ * Params:
+ *      int argc: the number of command-line arguments
+ *      char *argv[]: the array of command-line argument strings
+ *
+ * Return:
+ *      Returns EXIT_SUCCESS if the program is run successfully.
+ *      Returns EXIT_FAILURE if the command line is invalid, if file
+ *      cannot be opened, or if program cannot be loaded.
+ *
+ * Expects:
+ *      The program is called with exactly one file argument naming a
+ *      valid UM binary.
+ *
+ * Notes:
+ *      Prints an error message to stderr and exits with EXIT_FAILURE if
+ *      expectations are not met.
+ *
+ ************************/
 int main(int argc, char *argv[])
 {
         if (argc != 2) {
