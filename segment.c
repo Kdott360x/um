@@ -17,8 +17,29 @@
 #include <iso646.h>
 
 
-// void Segment_put(Segment_T seg, uint32_t index, uint32_t value);
-
+/****** Segment_put ********
+ *
+ * Stores the given 32-bit value into the given segment at the given
+ * index.
+ *
+ * Params:
+ *      Segment_T seg: the segment in which the value will be stored
+ *      uint32_t index: the position in the segment to update
+ *      uint32_t value: the word to write into the segment
+ *
+ * Return:
+ *      None
+ *
+ * Expects:
+ *      seg is not NULL and index is within the bounds of the segment.
+ *
+ * Notes:
+ *      Replaces the word currently stored at seg->words[index] with
+ *      value.
+ *
+ *      Will CRE if seg is NULL or if index is out of bounds.
+ *
+ ************************/
 void Segment_put(Segment_T seg, uint32_t index, uint32_t value)
 {
         assert(seg != NULL);

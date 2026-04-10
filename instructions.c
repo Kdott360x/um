@@ -27,7 +27,7 @@
 #include <iso646.h>
 
 
-// all are helpers so all can be static
+// static helper declarations
 static inline uint32_t get_opcode(uint32_t word);
 static inline uint32_t get_ra(uint32_t word);
 static inline uint32_t get_rb(uint32_t word);
