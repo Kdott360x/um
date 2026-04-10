@@ -3,10 +3,20 @@ Names: James Molloy(jmollo02); Henry Dotterer (hdotte01)
 Acknowledgements of help:  We received help from the TA's at office hours. This 
                         included help with conceptuallizing how segments
                         and their potential relationships to sequences when 
-                        mapping and unmapping segments.
+                        mapping and unmapping segments. Also covered how 
+                        segment sizing and sizing of the segments array could 
+                        be done.
 
-Identification of correct implementation: Our UM functionality is exactly as
-expected.
+Identification of correct implementation: 
+        We correctly map and unmap segments by saving the id's of the unmapped
+        segments and storing them in a sequence for later use. Our 
+        implementation correctly stores the pointers according to the spec
+        by casting them first as uintptr_ts.
+
+Incorrect Implementations:
+        When initially allocating the array to contain the inital program, we 
+        use dynamic sizing by multiplying by 2. This could cause a lot of 
+        allocated space that is not used. A better method would be to use stat.
 
 Departures from Design:
 The main departues from design are the following.
