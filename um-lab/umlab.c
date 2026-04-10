@@ -54,6 +54,11 @@ static inline Um_instruction input(Um_register c)
         return three_register(IN, 0, 0, c);
 }
 
+static inline Um_instruction output(Um_register c)
+{
+        return three_register(OUT, 0, 0, c);
+}
+
 static inline Um_instruction cmov(Um_register a, Um_register b, Um_register c)
 {
         return three_register(CMOV, a, b, c);
@@ -69,10 +74,32 @@ static inline Um_instruction sstore(Um_register a, Um_register b, Um_register c)
         return three_register(SSTORE, a, b, c);
 }
 
-Um_instruction output(Um_register c)
+static inline Um_instruction multiply(Um_register a, Um_register b, Um_register c)
 {
-        return three_register(OUT, 0, 0, c);
+        return three_register(MUL, a, b, c);
 }
+
+static inline Um_instruction divide(Um_register a, Um_register b, Um_register c)
+{
+        return three_register(DIV, a, b, c);
+}
+
+static inline Um_instruction nand(Um_register a, Um_register b, Um_register c)
+{
+        return three_register(NAND, a, b, c);
+}
+
+static inline Um_instruction map_segment(Um_register b, Um_register c)
+{
+        return three_register(ACTIVATE, 0, b, c);
+}
+
+static inline Um_instruction unmap_segment(Um_register c)
+{
+        return three_register(INACTIVATE, 0, 0, c);
+}
+
+/* END Wrapper functions for each of the instructions */
 
 /* Functions for working with streams */
 
@@ -200,6 +227,37 @@ void build_cmov_nonzero_test(Seq_T stream)
         append(stream, halt());
 }
 
+void build_mult_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 3));
+        append(stream, loadval(r2, 2));
+        append(stream, multiply(r3, r1, r2)); 
+        append(stream, loadval(r4, 48));
+        append(stream, add(r5, r3, r4));
+        append(stream, output(r5));
+        append(stream, halt());
+}
+
+void build_div_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 8));
+        append(stream, loadval(r2, 2));
+        append(stream, divide(r3, r1, r2));
+        append(stream, loadval(r4, 48));
+        append(stream, add(r5, r3, r4));
+        append(stream, output(r5));
+        append(stream, halt());
+}
+
+void build_nand_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 255));
+        append(stream, loadval(r2, 207));
+        append(stream, nand(r3, r1, r2));
+        append(stream, output(r3));
+        append(stream, halt());
+}
+
 void build_seg_store_load_zero_test(Seq_T stream)
 {
         append(stream, loadval(r1, 0));
@@ -209,5 +267,20 @@ void build_seg_store_load_zero_test(Seq_T stream)
         append(stream, sstore(r1, r2, r3));
         append(stream, sload(r4, r1, r2));
         append(stream, output(r4));
+        append(stream, halt());
+}
+
+void build_map_store_load_unmap_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 1));
+        append(stream, map_segment(r2, r1));
+
+        append(stream, loadval(r3, 0));
+        append(stream, loadval(r4, 'M'));
+
+        append(stream, sstore(r2, r3, r4));
+        append(stream, sload(r5, r2, r3));
+        append(stream, output(r5));
+        append(stream, unmap_segment(r2));
         append(stream, halt());
 }
