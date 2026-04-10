@@ -195,7 +195,7 @@ static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
                 id = (uint32_t)(uintptr_t)Seq_remlo(um->unmapped);
                 um->segments[id] = new_seg;
         } else {
-                if (um->size == um->capacity) {
+                if (um->seg_size == um->seg_capacity) {
                         um->seg_capacity *= 2;
                         um->segments = realloc(um->segments, um->seg_capacity *
                                                  sizeof(*um->segments));
@@ -218,7 +218,7 @@ static void unmap_segment(UM_T um, uint32_t rc)
         uint32_t id = um->regs[rc];
 
         // free the segment at the id
-        segment_free(&(um->segments[id]));
+        Segment_free(&(um->segments[id]));
         assert(um->segments[id] == NULL);
 
         // add the id to the sequence
@@ -250,7 +250,7 @@ static void load_program(UM_T um, uint32_t rb, uint32_t rc)
         }
         Segment_T source = um->segments[um->regs[rb]];
 
-        Segment_free(um->segments[0]);
+        Segment_free(&(um->segments[0]));
         assert(um->segments[0] == NULL);
 
         // creating new id

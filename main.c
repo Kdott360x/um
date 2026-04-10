@@ -37,8 +37,7 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
         // run the UM_run command with the segmentZero
-        // NOTE: do we need to free segment zero?
-        segment_zero = NULL;     
+        // NOTE: do we need to free segment zero?  
 
 
         // printf("program loaded successfully\n");
@@ -49,7 +48,7 @@ int main(int argc, char *argv[])
         // }
 
 
-        UM_T um = UM_new(program);
+        UM_T um = UM_new(segment_zero);
 
         UM_run(um);
         UM_free(&um);
