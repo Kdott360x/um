@@ -385,6 +385,10 @@ static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
                         um->segments = realloc(um->segments, um->seg_capacity *
                                                  sizeof(*um->segments));
                         assert(um->segments != NULL);
+
+                        for (uint32_t i = old_capacity; i < um->seg_capacity; i++) {
+                                um->segments[i] = NULL;
+                        }
                 }
                 // handle create new segment case
                 id = um->seg_size;
