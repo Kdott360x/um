@@ -60,6 +60,7 @@ UM_T UM_new(Segment_T seg_zero)
         um->segments[0] = seg_zero;
 
         // init segment capacity to 1
+        um->seg_size = 1;	
         um->seg_capacity = 1;	
         // NOTE: Can do individual add ns if time is inefficient
 

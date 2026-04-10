@@ -34,8 +34,6 @@ static inline uint32_t get_opcode(uint32_t word);
 static inline uint32_t get_ra(uint32_t word);
 static inline uint32_t get_rb(uint32_t word);
 static inline uint32_t get_rc(uint32_t word);
-static inline uint32_t lv_ra(uint32_t word);
-static inline uint32_t lv_value(uint32_t word);
 
 static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
 static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
@@ -49,7 +47,6 @@ static void unmap_segment(UM_T um, uint32_t rc);
 static void output(UM_T um, uint32_t rc);
 static void input(UM_T um, uint32_t rc);
 static void load_program(UM_T um, uint32_t rb, uint32_t rc);
-static void load_value(UM_T um, uint32_t ra, uint32_t value);
 
 
 bool run_instruction(UM_T um, uint32_t instruction)
@@ -59,15 +56,15 @@ bool run_instruction(UM_T um, uint32_t instruction)
         uint32_t opcode = get_opcode(instruction);
 
         // check for op 13
-        if (opcode = 13) {
+        if (opcode == 13) {
                 // find register
                 uint32_t regA_13 = (instruction >> 25) & 0x7;
 
                 // find value
-                uint32_t val_13 = (instruction >> 25) & 0x01FFFFFF;
+                uint32_t val_13 = instruction & 0x01FFFFFF;
 
                 // put val in register
-                um->reg[regA_13] = val_13;
+                um->regs[regA_13] = val_13;
 
                 return true;
         }
@@ -76,8 +73,8 @@ bool run_instruction(UM_T um, uint32_t instruction)
         //set the registers vefore getting into the code: note use um->regs[reg]
         // to access the actual value stored, i.e. what is below is the index
         uint32_t ra = get_ra(instruction);
-        uint32_t rb = get_ra(instruction);
-        uint32_t rc = get_ra(instruction);
+        uint32_t rb = get_rb(instruction);
+        uint32_t rc = get_rc(instruction);
 
 
 
@@ -158,7 +155,6 @@ static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 
 static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
-        // um->segment[rb][]
         um->regs[ra] = Segment_get(um->segments[um->regs[rb]], um->regs[rc]);
 }
 
@@ -184,7 +180,7 @@ static void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 
 static void nand(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
-        um->regs[ra] = ~(um->regs[rb] & um->regs[rc])
+        um->regs[ra] = ~(um->regs[rb] & um->regs[rc]);
 }
 
 static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
@@ -193,17 +189,23 @@ static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
 
         uint32_t length = um->regs[rc];
         Segment_T new_seg = Segment_new(length);
-
         uint32_t id;
 
         if (Seq_length(um->unmapped) > 0) {
                 id = (uint32_t)(uintptr_t)Seq_remlo(um->unmapped);
                 um->segments[id] = new_seg;
         } else {
+                if (um->size == um->capacity) {
+                        um->seg_capacity *= 2;
+                        um->segments = realloc(um->segments, um->seg_capacity *
+                                                 sizeof(*um->segments));
+                        assert(um->segments != NULL);
+                }
                 // handle create new segment case
-
+                id = um->seg_size;
+                um->segments[id] = new_seg;
+                um->seg_size++;
         }
-
         // set the value in rb to whatever id we end up with
         um->regs[rb] = id;
 }
@@ -213,8 +215,11 @@ static void unmap_segment(UM_T um, uint32_t rc)
         assert(um != NULL);
 
         // set id equal to what is in rc
+        uint32_t id = um->regs[rc];
 
         // free the segment at the id
+        segment_free(&(um->segments[id]));
+        assert(um->segments[id] == NULL);
 
         // add the id to the sequence
         Seq_addlo(um->unmapped, (void *)(uintptr_t)id);
@@ -237,6 +242,26 @@ static void input(UM_T um, uint32_t rc)
 }
 
 static void load_program(UM_T um, uint32_t rb, uint32_t rc)
-{
+{      
+        assert(um != NULL);
+        if (um->regs[rb] == 0) {
+                um->program_counter = um->regs[rc];
+                return;
+        }
+        Segment_T source = um->segments[um->regs[rb]];
 
+        Segment_free(um->segments[0]);
+        assert(um->segments[0] == NULL);
+
+        // creating new id
+        uint32_t length = Segment_length(source);
+        Segment_T new_seg = Segment_new(length);
+
+        // copying over 
+        for (uint32_t i = 0; i < length; i++) {
+                uint32_t word = Segment_get(source, i);
+                Segment_put(new_seg, i, word);
+        }
+        um->segments[0] = new_seg;
+        um->program_counter = um->regs[rc];
 }

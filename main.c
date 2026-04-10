@@ -49,10 +49,10 @@ int main(int argc, char *argv[])
         // }
 
 
-        // UM_T um = UM_new(program);
+        UM_T um = UM_new(program);
 
-        // UM_run(um);
-        // UM_free(&um);
+        UM_run(um);
+        UM_free(&um);
 
         return EXIT_SUCCESS;
 }

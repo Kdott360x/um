@@ -29,6 +29,7 @@ typedef struct UM {
         uint32_t program_counter;    		// program controller
 
         Segment_T *segments;		        // mapped segments
+        uint32_t seg_size;		
         uint32_t seg_capacity;		
 
         Seq_T unmapped;		                // unmapped 			
