@@ -218,6 +218,13 @@ void build_50m_loop_test(Seq_T stream)
         append(stream, halt());
 }
 
+void build_loadval_six_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 54));
+        append(stream, output(r1));
+        append(stream, halt());
+}
+
 void build_input_output_test(Seq_T stream)
 {
         append(stream, input(r1));

@@ -10,3 +10,4 @@ div-four.um
 nand-zero.um
 seg-store-load-zero.um
 map-store-load-unmap.um
+loadval-six.um

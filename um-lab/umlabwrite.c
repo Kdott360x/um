@@ -23,6 +23,7 @@ extern void build_nand_test(Seq_T instructions);
 extern void build_seg_store_load_zero_test(Seq_T instructions);
 extern void build_map_store_load_unmap_test(Seq_T instructions);
 extern void build_50m_loop_test(Seq_T instructions);
+extern void build_loadval_six_test(Seq_T instructions);
 
 /* The array `tests` contains all unit tests for the lab. */
 
@@ -48,6 +49,7 @@ static struct test_info {
         { "nand-zero",            NULL, "0", build_nand_test },
         { "seg-store-load-zero",  NULL, "Z", build_seg_store_load_zero_test },
         { "map-store-load-unmap", NULL, "M", build_map_store_load_unmap_test },
+        { "loadval-six", NULL, "6", build_loadval_six_test },
 
 };
 
