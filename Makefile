@@ -34,7 +34,7 @@ INCLUDES = $(shell echo *.h)
 
 ############### Rules ###############
 
-all: readtest
+all: um
 
 
 ## Compile step (.c files -> .o files)
@@ -46,7 +46,7 @@ all: readtest
 
 ## Linking step (.o -> executable program)
 
-readtest: main.o um.o segment.o instructions.o
+um: main.o um.o segment.o instructions.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 

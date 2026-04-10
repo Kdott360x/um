@@ -49,6 +49,26 @@ static inline Um_instruction add(Um_register a, Um_register b, Um_register c)
         return three_register(ADD, a, b, c);
 }
 
+static inline Um_instruction input(Um_register c)
+{
+        return three_register(IN, 0, 0, c);
+}
+
+static inline Um_instruction cmov(Um_register a, Um_register b, Um_register c)
+{
+        return three_register(CMOV, a, b, c);
+}
+
+static inline Um_instruction sload(Um_register a, Um_register b, Um_register c)
+{
+        return three_register(SLOAD, a, b, c);
+}
+
+static inline Um_instruction sstore(Um_register a, Um_register b, Um_register c)
+{
+        return three_register(SSTORE, a, b, c);
+}
+
 Um_instruction output(Um_register c)
 {
         return three_register(OUT, 0, 0, c);
@@ -132,7 +152,7 @@ Um_instruction three_register(Um_opcode op, int ra, int rb, int rc)
                 myInstruction = myInstruction << 3;
                 myInstruction = myInstruction | intArray[i];
         }
-        printf("Codeword (decimal): %" PRIu32  "\n", myInstruction);
+
         return myInstruction;
 }
 
@@ -151,4 +171,43 @@ Um_instruction loadval(unsigned ra, unsigned val)
         myInstruction = myInstruction | ((Um_instruction)val);
 
         return myInstruction;
+}
+
+void build_input_output_test(Seq_T stream)
+{
+        append(stream, input(r1));
+        append(stream, output(r1));
+        append(stream, halt());
+}
+
+void build_cmov_zero_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 'A'));
+        append(stream, loadval(r2, 'B'));
+        append(stream, loadval(r3, 0));
+        append(stream, cmov(r1, r2, r3));
+        append(stream, output(r1));
+        append(stream, halt());
+}
+
+void build_cmov_nonzero_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 'A'));
+        append(stream, loadval(r2, 'B'));
+        append(stream, loadval(r3, 1));
+        append(stream, cmov(r1, r2, r3));
+        append(stream, output(r1));
+        append(stream, halt());
+}
+
+void build_seg_store_load_zero_test(Seq_T stream)
+{
+        append(stream, loadval(r1, 0));
+        append(stream, loadval(r2, 0));
+        append(stream, loadval(r3, 'Z'));
+
+        append(stream, sstore(r1, r2, r3));
+        append(stream, sload(r4, r1, r2));
+        append(stream, output(r4));
+        append(stream, halt());
 }
