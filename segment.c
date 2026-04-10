@@ -1,11 +1,12 @@
 /*
  *  segment.c
  *  Kodi Dotterer (hdotte01), James Molloy (jmollo02)
- *  03/3/2026
+ *  04/10/2026
  *
  *  CS 40 Project 6: um
  *
- *  Implementation of the segment.h file
+ *  Implements segmented memory creation, access, and cleanup for the
+ *  Universal Machine.
  * 
  */
 
@@ -47,7 +48,6 @@ void Segment_put(Segment_T seg, uint32_t index, uint32_t value)
 
         seg->words[index] = value;
 }
-
 
 /****** Segment_new ****
  *
