@@ -27,10 +27,68 @@ The main departues from design are the following.
      word structe, sent commands to the proper helper functions, and performed
      the function of "load value" without a helper function.
 
-– Succinctly describes the architecture of your system. Identify the modules 
-used, what abstrac- tions they implement, what secrets they know, and how they 
-relate to one another. Avoid narra- tive descriptions of the behavior of 
-particular modules.
+ Architecture:
+
+- main.c: 	parse args, load program, call run
+     Description: Takes in the arguments, which is going to be solely a file, 
+     and then it calls um.run. Very simple driver file that sends most of the 
+     work onward to um.c. The only secret it knows is that when the um 
+     functions are called, the um runs… does not know many secrets. It 
+     uses the um struct to call the main um function that does most of the 
+     heavy lifting… no Hanson structures used here. Only interacts with um.c, 
+     and additionally the segments.c to create segment zero, where it has no 
+     clue how segments are implemented (secret).
+- um.c: 		overall machine state and run loop
+     Description: Create, manage the UM struct and loop through the segment 
+     zero program, feeding each uint32_t word command into instructions.c 
+     which will complete the necessary actions. We will have the loop go 
+     until the halt command is called, which terminates the program. Each time 
+     the loop iterates, the program will be set to segment 0 in case that the 
+     contents of this segment changed. The UM struct will contain the 8 
+     registers, the program controller pointer, an array of memory segments, a 
+     segment capacity AND a segment size tracker, and a program pointer that 
+     always points to the start of segment 0. It also keeps track of ids of 
+     unused memory segments… These ids are values in the array of addresses 
+     for segments that do not hold addresses to segments… they point to null. 
+     It knows the secret of how the um works, but it does not know how the 
+     individual instructions are performed and differentiated besides sending 
+     a word to instructions.c… the same follows for segments… it does not know 
+     how the segments actually work under the hood. It interacts with these two
+     interfaces without knowledge of the “secrets.” Mapping and unmapping are 
+     implemented in instructions, but the capacity and size variables necessary
+     for these are kept in the UM.
+segment.c: 	create, free, load, store segments
+     Description: This module manages the UM’s segments that make up its 
+     memory. It is responsible for creating, freeing, and accessing memory 
+     segments. We are able to create memory segments given a length… it 
+     mallocs an array of 32 bit words and returns the address, setting all 
+     the values initially to zero. Each segment is represented as a 
+     dynamically allocated array of 32-bit words together with its length. 
+     This module provides the basic memory operations needed by the emulator, 
+     including creating a new segment, freeing an existing segment, loading a 
+     word/value from a segment(get), and storing a word into a segment(put). 
+     We also have a special function that takes in a file, and using a capacity
+      and size variable architecture (basic arraylist logic), creates an array
+       that can hold all the commands… This will be used for segment zero 
+       mainly. Our segment struct will have the length of the array and the 
+       actual array. NO INTERACTION WITH OTHER MODULES. It is only used by 
+       other modules… no secrets are kept from segment.c!!!
+instructions.c: 	Execute all operations given solely a word
+     Description: This part of the code will take in a word as input. It will
+     distinguish between normal commands and the loadVal command. It will then 
+     use the “switch case statement” structure in C to send the appropriate 
+     amount of registers to the appropriate function for each of the 14 
+     instructions. Its functions will need a pointer to the UM struct… it 
+     will not know the secret of how the UM stores memory, it will just know 
+     how to use the registers and memory to perform instructions. It keeps 
+     the secret from UM of how instructions are decoded and performed. It 
+     interacts with both the UM and segment interfaces, because it needs to 
+     create new segments and it needs to use values from the given um struct 
+     in the parameters. Mapping and unmapping is mainly dealt with here.
+       
+     
+
+
 
 
 – Explains how long it takes your UM to execute 50 million instructions, and 
