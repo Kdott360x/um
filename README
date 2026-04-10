@@ -1,1 +1,45 @@
-//setters
+Names: James Molloy(jmollo02); Henry Dotterer ()
+
+Acknowledgements of help:  We received help from the TA's at office hours.
+
+Identification of correct implementation: Our UM functionality is exactly as
+expected.
+
+Departures from Design:
+The main departues from design are the following.
+     - We initially thought that our run function would take in the file that
+     would be given to us from the user, and that the segment zero would be 
+     created inside of our run UM function. We changed this so that segment 0
+     was made before calling run, and our run function only took segment zero 
+     as a paramater. 
+     - We initially thought that the segment.c interface would deal with
+     mapping and unmapping implementation. However, as we gained a better
+     understanding of how mapping and unmapping works, we found that it made
+     more sense to deal with this functionality in the instructions.c 
+     interface. We found that using size and capacity variables was crucial
+     for our own segment ID system and our mapping implementation.
+     - We initially thought that out segments.c function would be 
+     comprised of a lot of different sorting functions... one function to 
+     differentiate between the different word structures(load value vs. normal),
+     one function to send each normal word structure to it's assigned 
+     helper function, and then individual helper functions for every command.
+     We eventually only had one sorting function that differentiated between
+     word structe, sent commands to the proper helper functions, and performed
+     the function of "load value" without a helper function.
+
+– Succinctly describes the architecture of your system. Identify the modules 
+used, what abstrac- tions they implement, what secrets they know, and how they 
+relate to one another. Avoid narra- tive descriptions of the behavior of 
+particular modules.
+
+
+– Explains how long it takes your UM to execute 50 million instructions, and 
+how you know
+
+– Mentions each UM unit test (from UMTESTS) by name, explaining what each one 
+tests and how
+
+
+– How many hours you have spent analyzing the assignment: 3
+– How many hours you have spent preparing your design: 11
+– How many hours you have spent solving the problems after your analysis: 11
