@@ -26,8 +26,6 @@
 #include <stdio.h>
 #include <iso646.h>
 
-#define EOF -1
-
 
 // all are helpers so all can be static
 static inline uint32_t get_opcode(uint32_t word);

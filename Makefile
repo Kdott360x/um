@@ -46,7 +46,7 @@ all: readtest
 
 ## Linking step (.o -> executable program)
 
-readtest: main.o um.o segment.o
+readtest: main.o um.o segment.o instructions.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 
