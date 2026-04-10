@@ -381,6 +381,7 @@ static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
                 um->segments[id] = new_seg;
         } else {
                 if (um->seg_size == um->seg_capacity) {
+                        uint32_t old_capacity = um->seg_capacity;
                         um->seg_capacity *= 2;
                         um->segments = realloc(um->segments, um->seg_capacity *
                                                  sizeof(*um->segments));
