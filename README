@@ -1,6 +1,9 @@
 Names: James Molloy(jmollo02); Henry Dotterer (hdotte01)
 
-Acknowledgements of help:  We received help from the TA's at office hours.
+Acknowledgements of help:  We received help from the TA's at office hours. This 
+                        included help with conceptuallizing how segments
+                        and their potential relationships to sequences when 
+                        mapping and unmapping segments.
 
 Identification of correct implementation: Our UM functionality is exactly as
 expected.
@@ -116,66 +119,80 @@ halt.um
 Tests the Halt instruction alone. The program immediately halts and
 produces no output.
 
+
 halt-verbose.um
-Tests Halt more defensively. The first instruction is Halt, so correct
+Tests Halt more. The first instruction is Halt, so correct
 behavior is still no output. If Halt were broken, the later
 instructions would print "Bad!\n", which helps detect a failure to
 stop execution.
 
+
 add-halt.um
-Tests the Add instruction's encoding and execution format by performing
-an addition and then halting. This test does not check printed output,
-but it helps verify that the instruction stream is formed correctly and
-that Add can execute without crashing.
+Tests Add instruction by performing an addition, then halting. 
+This test doesn’t check printed output, but it helps make sure that 
+the instruction stream is formed correctly and that Add can 
+execute without crashing.
+
 
 print-six.um
-Tests Load Value, Add, Output, and Halt together. The program loads 48
+Tests Load Value, Add, Output, Halt. Program loads 48
 into one register, 6 into another, adds them to produce the ASCII
-value for '6', outputs that character, and halts. Expected output is
-"6".
+value for '6', outputs that character, and halts. ‘6’ = 54 ASCII
+
 
 input-output.um
-Tests Input, Output, and Halt. It reads one character from standard
-input, writes that same character to standard output, and halts. The
-provided input and expected output are both "Q".
+Tests Input, Output, Halt. Makes sure input and output are both Q.
+
 
 cmov-zero.um
-Tests Conditional Move when the condition register contains 0. The
-program loads 'A' and 'B' into registers, uses a zero condition
-register, and then outputs the destination register. Because the
-condition is zero, the move should not happen, so the expected output
+Tests Conditional Move when condition register contains 0.
+Program loads 'A' and 'B' in registers, uses zero condition
+register, outputs the destination register. B/c the
+condition is zero, the move shouldn’t happen, so expected output
 is "A".
 
+
 cmov-nonzero.um
-Tests Conditional Move when the condition register is nonzero. The
-program loads 'A' and 'B' into registers, uses a nonzero condition
-register, performs the conditional move, and outputs the destination
-register. Because the condition is nonzero, the move should happen, so
-the expected output is "B".
+Tests Conditional Move when condition register is !=0. The
+program loads 'A' and 'B' into registers, uses nonzero condition
+register, performs conditional move, outputs the destination
+register. Because nonzero, the move should happen, so
+expected output is "B".
+
 
 mult-six.um
-Tests Multiplication, Load Value, Add, Output, and Halt. The program
+Tests Multiplication, Load Value, Add, Output. The program
 multiplies 3 by 2 to get 6, adds 48 to convert it to the ASCII code
 for '6', outputs that character, and halts. Expected output is "6".
+Also known as 54 in ascii.
+
 
 div-four.um
-Tests Division, Load Value, Add, Output, and Halt. The program divides
-8 by 2 to get 4, adds 48 to convert it to the ASCII code for '4',
+Tests Division, Load Value, Add, Output. The program divides
+8 / 2 = 4, adds 48 to convert it to the ascii code for '4',
 outputs that character, and halts. Expected output is "4".
 
+
 nand-zero.um
-Tests Bitwise NAND, Output, and Halt. The program chooses values so
-that the low byte of the NAND result is 48, which is the ASCII code
-for '0'. It outputs that character and halts. Expected output is "0".
+Tests Bitwise NAND, Output, Halt. The program chooses values so
+that low byte of NAND result is 48, which is the ascii code
+for '0'. It outputs this character. Expected output is "0".
+
 
 seg-store-load-zero.um
-Tests Segmented Store and Segmented Load on segment 0. The program
-stores the character 'Z' into an already-used location in segment 0,
-then loads the value back from that same location, outputs it, and
-halts. Expected output is "Z".
+Tests seg store and seg load on seg 0. Program stores 'Z' 
+into already-used location in segment 0,then loads value 
+back from that same location, outputs it. Expected output "Z".
+
 
 map-store-load-unmap.um
-Tests Map Segment, Segmented Store, Segmented Load, Unmap Segment,
-Output, and Halt. The program maps a new segment of length 1, stores
-'M' into offset 0 of that mapped segment, loads the value back,
-outputs it, unmaps the segment, and halts. Expected output is "M".
+Tests map seg, seg store, seg load, unmap seg, output, halt. 
+Program maps a new segment of length 1, stores 'M' into offset 
+0 of that mapped segment, loads the value back, outputs it, 
+unmaps the segment, and halts. Expected output is "M".
+
+
+loadval-six.um
+ Tests load value, output, and halt. Program loads the value 54,
+ which is the ASCII code for '6', into a register, outputs it,
+ and then halts. Expected output is "6".
