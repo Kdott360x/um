@@ -38,9 +38,6 @@ UM_T UM_new(Segment_T seg_zero)
         UM_T um = malloc(sizeof(*um));
         assert(um != NULL);
 
-        // set the program pointer to seg_zero
-        um->program = seg_zero;
-
         // init registers
         for (int i = 0; i < 8; i++) {
                 um->regs[i] = 0;
@@ -90,19 +87,17 @@ UM_T UM_new(Segment_T seg_zero)
 void UM_run(UM_T um) 
 {
         assert(um != NULL);
-        assert(um->program != NULL);
+        assert(um->segments[0] != NULL);
 
         bool program_is_running = true;
 
         while (program_is_running) {
                 uint32_t curr_instruction =
-                        Segment_get(um->program, um->program_counter);
+                        Segment_get(um->segments[0], um->program_counter);
 
                 um->program_counter++;
 
                 program_is_running = run_instruction(um, curr_instruction);
-
-                um->program = um->segments[0];
         }
 }
 

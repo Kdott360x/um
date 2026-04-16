@@ -34,7 +34,6 @@ typedef struct UM {
 
         Seq_T unmapped;		                // unmapped 			
 
-        Segment_T program;
 } *UM_T;
 
 
