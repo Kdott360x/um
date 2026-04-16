@@ -74,7 +74,8 @@ static inline Um_instruction sstore(Um_register a, Um_register b, Um_register c)
         return three_register(SSTORE, a, b, c);
 }
 
-static inline Um_instruction multiply(Um_register a, Um_register b, Um_register c)
+static inline Um_instruction multiply(Um_register a, Um_register b, 
+                                                                Um_register c)
 {
         return three_register(MUL, a, b, c);
 }

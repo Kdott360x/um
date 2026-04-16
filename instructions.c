@@ -387,7 +387,8 @@ static void map_segment(UM_T um, uint32_t rb, uint32_t rc)
                                                  sizeof(*um->segments));
                         assert(um->segments != NULL);
 
-                        for (uint32_t i = old_capacity; i < um->seg_capacity; i++) {
+                        for (uint32_t i = old_capacity; i < um->seg_capacity;
+                                                                        i++) {
                                 um->segments[i] = NULL;
                         }
                 }
