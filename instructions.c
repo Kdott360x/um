@@ -29,17 +29,17 @@ static inline uint32_t get_rb(uint32_t word);
 static inline uint32_t get_rc(uint32_t word);
 
 /* OPERATION HELPERS -> declarations */
-static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
-static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
-static void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
-static void add(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
-static void multiply(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
-static void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
-static void nand(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void add(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void multiply(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
+static inline void nand(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc);
 static void map_segment(UM_T um, uint32_t rb, uint32_t rc);
 static void unmap_segment(UM_T um, uint32_t rc);
-static void output(UM_T um, uint32_t rc);
-static void input(UM_T um, uint32_t rc);
+static inline void output(UM_T um, uint32_t rc);
+static inline void input(UM_T um, uint32_t rc);
 static void load_program(UM_T um, uint32_t rb, uint32_t rc);
 
 /****** run_instruction ********
@@ -230,7 +230,7 @@ static inline uint32_t get_rc(uint32_t word)
  *      None
  *
  ************************/
-static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         if (um->regs[rc] != 0) {
                 um->regs[ra] = um->regs[rb];
@@ -251,9 +251,10 @@ static void conditional_move(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
  *      None
  *
  ************************/
-static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
-        um->regs[ra] = Segment_get(um->segments[um->regs[rb]], um->regs[rc]);
+        Segment_T seg = um->segments[um->regs[rb]];
+        um->regs[ra] = seg->words[um->regs[rc]];
 }
 
 /****** segmented_store ********
@@ -270,9 +271,10 @@ static void segmented_load(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
  *      None
  *
  ************************/
-static void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
-        Segment_put(um->segments[um->regs[ra]], um->regs[rb], um->regs[rc]);
+        Segment_T seg = um->segments[um->regs[ra]];
+        seg->words[um->regs[rb]] = um->regs[rc];
 }
 
 /****** add ********
@@ -289,7 +291,7 @@ static void segmented_store(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
  *      None
  *
  ************************/
-static void add(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void add(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = (um->regs[rb] + um->regs[rc]);
 }
@@ -309,7 +311,7 @@ static void add(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
  *      None
  *
  ************************/
-static void multiply(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void multiply(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = (um->regs[rb] * um->regs[rc]);
 }
@@ -329,7 +331,7 @@ static void multiply(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
  *      None
  *
  ************************/
-static void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = (um->regs[rb] / um->regs[rc]);
 }
@@ -349,7 +351,7 @@ static void divide(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
  *      None
  *
  ************************/
-static void nand(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
+static inline void nand(UM_T um, uint32_t ra, uint32_t rb, uint32_t rc)
 {
         um->regs[ra] = ~(um->regs[rb] & um->regs[rc]);
 }
@@ -440,10 +442,9 @@ static void unmap_segment(UM_T um, uint32_t rc)
  *      None
  *
  ************************/
-static void output(UM_T um, uint32_t rc)
+static inline void output(UM_T um, uint32_t rc)
 {
-        uint32_t value = um->regs[rc];
-        putchar((char)value);
+        putchar((int)um->regs[rc]);
 }
 
 /****** input ********
@@ -458,7 +459,7 @@ static void output(UM_T um, uint32_t rc)
  *      None
  *
  ************************/
-static void input(UM_T um, uint32_t rc)
+static inline void input(UM_T um, uint32_t rc)
 {
         int32_t current = (int32_t)getchar();
         if (current == EOF) {
