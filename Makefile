@@ -46,7 +46,7 @@ all: um
 
 ## Linking step (.o -> executable program)
 
-um: main.o um.o segment.o instructions.o
+um: main.o um.o segment.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 
