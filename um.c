@@ -96,6 +96,7 @@ void UM_run(UM_T um)
         assert(um != NULL);
         assert(um->segments[0] != NULL);
 
+        // set the local vars for hot mem
         uint32_t *regs = um->regs;
         Segment_T *segments = um->segments;
         uint32_t pc = um->program_counter;
