@@ -75,7 +75,7 @@ bool run_instruction(UM_T um, uint32_t instruction)
         assert(um != NULL);
 
         // get and store opcode
-        uint32_t opcode = get_opcode(instruction);
+        uint32_t opcode = (instruction >> 28);
 
         // check for op 13
         if (opcode == 13) {
