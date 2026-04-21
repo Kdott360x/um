@@ -10,6 +10,7 @@
  */
 
 #include "um.h"
+#include <stdbool.h>
 
 // Helper functions for the run_um loop
 
@@ -99,82 +100,101 @@ void UM_run(UM_T um)
         Segment_T *segments = um->segments;
         uint32_t pc = um->program_counter;
 
-        for (;;) {
+        while (true) {
                 Segment_T program = segments[0];
                 uint32_t instruction = program->words[pc++];
                 uint32_t opcode = instruction >> 28;
 
+                // check for op 13
                 if (opcode == 13) {
-                        uint32_t ra = (instruction >> 25) & 0x7;
-                        uint32_t value = instruction & 0x01FFFFFF;
-                        regs[ra] = value;
+                        // find register
+                        uint32_t regA_13 = (instruction >> 25) & 0x7;
+
+                        // find value
+                        uint32_t val_13 = instruction & 0x01FFFFFF;
+
+                        // put val in register
+                        regs[regA_13] = val_13;
+
                         continue;
                 }
 
+                // set regs
                 uint32_t ra = (instruction >> 6) & 0x7;
                 uint32_t rb = (instruction >> 3) & 0x7;
                 uint32_t rc = instruction & 0x7;
 
+                // the rest of the switch cases
                 switch (opcode) {
                 case 0:
+                        // cond move
                         if (regs[rc] != 0) {
                                 regs[ra] = regs[rb];
                         }
                         break;
 
                 case 1: {
+                        // seg load
                         Segment_T seg = segments[regs[rb]];
                         regs[ra] = seg->words[regs[rc]];
                         break;
                 }
 
                 case 2: {
+                        // seg_store
                         Segment_T seg = segments[regs[ra]];
                         seg->words[regs[rb]] = regs[rc];
                         break;
                 }
 
                 case 3:
+                        // add
                         regs[ra] = regs[rb] + regs[rc];
                         break;
 
                 case 4:
+                        // mult
                         regs[ra] = regs[rb] * regs[rc];
                         break;
 
                 case 5:
+                        // div
                         regs[ra] = regs[rb] / regs[rc];
                         break;
 
                 case 6:
+                        // and
                         regs[ra] = ~(regs[rb] & regs[rc]);
                         break;
 
                 case 7:
+                        // exit program, but reset pc first
                         um->program_counter = pc;
                         return;
 
                 case 8:
+                        // map
                         um->program_counter = pc;
                         map_segment(um, rb, rc);
-                        regs = um->regs;
                         segments = um->segments;
                         pc = um->program_counter;
                         break;
 
                 case 9:
+                        // unmap
                         um->program_counter = pc;
                         unmap_segment(um, rc);
-                        regs = um->regs;
                         segments = um->segments;
                         pc = um->program_counter;
                         break;
 
                 case 10:
+                        // output
                         putchar((int)regs[rc]);
                         break;
 
                 case 11: {
+                        // input
                         int in = getchar();
                         if (in == EOF) {
                                 regs[rc] = 0xFFFFFFFF;
@@ -185,9 +205,9 @@ void UM_run(UM_T um)
                 }
 
                 case 12:
+                        // load program
                         um->program_counter = pc;
                         load_program(um, rb, rc);
-                        regs = um->regs;
                         segments = um->segments;
                         pc = um->program_counter;
                         break;
