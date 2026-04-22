@@ -99,6 +99,8 @@ void UM_run(UM_T um)
         // set the local vars for hot mem
         uint32_t *regs = um->regs;
         Segment_T *segments = um->segments;
+
+        // index local var to track
         uint32_t pc = um->program_counter;
 
         while (true) {
