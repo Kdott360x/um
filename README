@@ -1,208 +1,127 @@
 Names: James Molloy(jmollo02); Henry Dotterer (hdotte01)
 
-Acknowledgements of help:  We received help from the TA's at office hours. This 
-                        included help with conceptuallizing how segments
-                        and their potential relationships to sequences when 
-                        mapping and unmapping segments. Also covered how 
-                        segment sizing and sizing of the segments array could 
-                        be done.
+Acknowledgements of help:  Did not receive help from office hours but we did get some pointers
+          The TA's in lab. They helped us understand the importance of the O2 and O1 compiling 
+          flags and how they are different.
 
-Identification of correct implementation: 
-        We correctly map and unmap segments by saving the id's of the unmapped
-        segments and storing them in a sequence for later use. Our 
-        implementation correctly stores the pointers according to the spec
-        by casting them first as uintptr_ts.
-
-Incorrect Implementations:
-        When initially allocating the array to contain the inital program, we 
-        use dynamic sizing by multiplying by 2. This could cause a lot of 
-        allocated space that is not used. A better method would be to use stat.
-
-Departures from Design:
-The main departues from design are the following.
-     - We initially thought that our run function would take in the file that
-     would be given to us from the user, and that the segment zero would be 
-     created inside of our run UM function. We changed this so that segment 0
-     was made before calling run, and our run function only took segment zero 
-     as a paramater. 
-     - We initially thought that the segment.c interface would deal with
-     mapping and unmapping implementation. However, as we gained a better
-     understanding of how mapping and unmapping works, we found that it made
-     more sense to deal with this functionality in the instructions.c 
-     interface. We found that using size and capacity variables was crucial
-     for our own segment ID system and our mapping implementation.
-     - We initially thought that out segments.c function would be 
-     comprised of a lot of different sorting functions... one function to 
-     differentiate between the different word structures(load value vs. normal),
-     one function to send each normal word structure to it's assigned 
-     helper function, and then individual helper functions for every command.
-     We eventually only had one sorting function that differentiated between
-     word structe, sent commands to the proper helper functions, and performed
-     the function of "load value" without a helper function.
-
- Architecture:
-
-- main.c: 	parse args, load program, call run
-     Description: Takes in the arguments, which is going to be solely a file, 
-     and then it calls um.run. Very simple driver file that sends most of the 
-     work onward to um.c. The only secret it knows is that when the um 
-     functions are called, the um runs… does not know many secrets. It 
-     uses the um struct to call the main um function that does most of the 
-     heavy lifting… no Hanson structures used here. Only interacts with um.c, 
-     and additionally the segments.c to create segment zero, where it has no 
-     clue how segments are implemented (secret).
-- um.c: 		overall machine state and run loop
-     Description: Create, manage the UM struct and loop through the segment 
-     zero program, feeding each uint32_t word command into instructions.c 
-     which will complete the necessary actions. We will have the loop go 
-     until the halt command is called, which terminates the program. Each time 
-     the loop iterates, the program will be set to segment 0 in case that the 
-     contents of this segment changed. The UM struct will contain the 8 
-     registers, the program controller pointer, an array of memory segments, a 
-     segment capacity AND a segment size tracker, and a program pointer that 
-     always points to the start of segment 0. It also keeps track of ids of 
-     unused memory segments… These ids are values in the array of addresses 
-     for segments that do not hold addresses to segments… they point to null. 
-     It knows the secret of how the um works, but it does not know how the 
-     individual instructions are performed and differentiated besides sending 
-     a word to instructions.c… the same follows for segments… it does not know 
-     how the segments actually work under the hood. It interacts with these two
-     interfaces without knowledge of the “secrets.” Mapping and unmapping are 
-     implemented in instructions, but the capacity and size variables necessary
-     for these are kept in the UM.
-segment.c: 	create, free, load, store segments
-     Description: This module manages the UM’s segments that make up its 
-     memory. It is responsible for creating, freeing, and accessing memory 
-     segments. We are able to create memory segments given a length… it 
-     mallocs an array of 32 bit words and returns the address, setting all 
-     the values initially to zero. Each segment is represented as a 
-     dynamically allocated array of 32-bit words together with its length. 
-     This module provides the basic memory operations needed by the emulator, 
-     including creating a new segment, freeing an existing segment, loading a 
-     word/value from a segment(get), and storing a word into a segment(put). 
-     We also have a special function that takes in a file, and using a capacity
-      and size variable architecture (basic arraylist logic), creates an array
-       that can hold all the commands… This will be used for segment zero 
-       mainly. Our segment struct will have the length of the array and the 
-       actual array. NO INTERACTION WITH OTHER MODULES. It is only used by 
-       other modules… no secrets are kept from segment.c!!!
-instructions.c: 	Execute all operations given solely a word
-     Description: This part of the code will take in a word as input. It will
-     distinguish between normal commands and the loadVal command. It will then 
-     use the “switch case statement” structure in C to send the appropriate 
-     amount of registers to the appropriate function for each of the 14 
-     instructions. Its functions will need a pointer to the UM struct… it 
-     will not know the secret of how the UM stores memory, it will just know 
-     how to use the registers and memory to perform instructions. It keeps 
-     the secret from UM of how instructions are decoded and performed. It 
-     interacts with both the UM and segment interfaces, because it needs to 
-     create new segments and it needs to use values from the given um struct 
-     in the parameters. Mapping and unmapping is mainly dealt with here.
-       
-     
-
-– Explains how long it takes your UM to execute 50 million instructions, and 
-how you know
+Assembly Analysis: 
+     Run_function is currently the hottest memory cost.
+     Why?
+     Run_instruction is called on each command word. This leads to having to load and unload registers for every single time we want to perform an operation.
+     This code runs for each word and handles the loading and unloading of the registers. This appears to be expensive as there are a lot of commands.
+     RUN_INSTRUCTION C CODE:
+     bool run_instruction(UM_T um, uint32_t instruction)
+     {
+          assert(um != NULL);
 
 
-Our UM executes 50 million instructions in about 0.59 seconds. We
-measured this by running cpu-limited 120 /usr/bin/time ./um um-lab/loop50m.um >
- /dev/null. We know it executes exactly 50,000,000 instructions because
-we built the test as a fixed loop with a known count. There are 3 setup
-instructions before the loop, 4 instructions in each loop iteration, and
-1 final halt instruction, so the total number of instructions is 4N + 4.
-We set N to 12,499,999, so 4(12,499,999) + 4 = 50,000,000.
+          // get and store opcode
+          uint32_t opcode = get_opcode(instruction);
 
 
-– Mentions each UM unit test (from UMTESTS) by name, explaining what each one 
-tests and how
+          // check for op 13
+          if (opcode == 13) {
+                    // find register
+                    uint32_t regA_13 = (instruction >> 25) & 0x7;
 
 
-– How many hours you have spent analyzing the assignment: 3
-– How many hours you have spent preparing your design: 11
-– How many hours you have spent solving the problems after your analysis: 11
+                    // find value
+                    uint32_t val_13 = instruction & 0x01FFFFFF;
 
 
-Descriptions of the UMTESTS
-
-halt.um
-Tests the Halt instruction alone. The program immediately halts and
-produces no output.
+                    // put val in register
+                    um->regs[regA_13] = val_13;
 
 
-halt-verbose.um
-Tests Halt more. The first instruction is Halt, so correct
-behavior is still no output. If Halt were broken, the later
-instructions would print "Bad!\n", which helps detect a failure to
-stop execution.
+                    return true;
+          }
 
 
-add-halt.um
-Tests Add instruction by performing an addition, then halting. 
-This test doesn’t check printed output, but it helps make sure that 
-the instruction stream is formed correctly and that Add can 
-execute without crashing.
+          // set regs
+          uint32_t ra = get_ra(instruction);
+          uint32_t rb = get_rb(instruction);
+          uint32_t rc = get_rc(instruction);
 
 
-print-six.um
-Tests Load Value, Add, Output, Halt. Program loads 48
-into one register, 6 into another, adds them to produce the ASCII
-value for '6', outputs that character, and halts. ‘6’ = 54 ASCII
+          // the rest of the swtich cases
+          switch (opcode) {
+          case 0:
+                    conditional_move(um, ra, rb, rc);
+                    break;
+          case 1:
+                    segmented_load(um, ra, rb, rc);
+                    break;
+          case 2:
+                    segmented_store(um, ra, rb, rc);
+                    break;
+          case 3:
+                    add(um, ra, rb, rc);
+                    break;
+          case 4:
+                    multiply(um, ra, rb, rc);
+                    break;
+          case 5:
+                    divide(um, ra, rb, rc);
+                    break;
+          case 6:
+                    nand(um, ra, rb, rc);
+                    break;
+          case 7:
+                    return false;
+          case 8:
+                    map_segment(um, rb, rc);
+                    break;
+          case 9:
+                    unmap_segment(um, rc);
+                    break;
+          case 10:
+                    output(um, rc);
+                    break;
+          case 11:
+                    input(um, rc);
+                    break;
+          case 12:
+                    load_program(um, rb, rc);
+                    break;
+          default:
+                    assert(false);
+          }
 
 
-input-output.um
-Tests Input, Output, Halt. Makes sure input and output are both Q.
+          return true;
+     }
+     Explanation of C code: 
+     The code begins by asserting that our um object is non-null. Next, we get the opcode for the command (using bitpacking in a helper function) inside the uint32 word. If the command is the load val command, we run this special instance using an if statement, and we continue to the next iteration of the while loop. 
+     If the command is not the load value command, the if statement is skipped, and we get the indexes of the three registers we will be using through bitpacking of the word command. We then perform each command using a helper function, and the appropriate values of the um are all updated in the helper functions. 
+     Each command returns true. If the opcode is 7, the run_instruction command returns false, and this signals for the program loop to end in the um_run function, and it ceases the program immediately.
+     A big picture takeaway from this c code is that we continuously use helper functions and pass in parameters to these helper functions. We expect this to continually load and unload registers which over the long run will be expensive. Another thing to note is that we repeatedly access the um->regs pointer. It would be faster to store this as a local variable, however, because we are in a separate file and looping through an individual command and passing in the entire UM, this becomes an issue. It would be faster to run this loop where we could store a local variable that stores um->regs as a local pointer variable. In other words run this loop directly in um.c.
+     RUN_INSTRUCTION ASSEMBLY CODE:
+     —---------------- entering run_instruction loop —--------------------
+     4011f0:    41 57                    push   r15
+     4011f2:    41 56                    push   r14
+     4011f4:    41 55                    push   r13
+     4011f6:    41 54                    push   r12
+     4011f8:    55                       push   rbp
+     4011f9:    48 89 fd                 mov    rbp,rdi
+     4011fc:    53                       push   rbx
+     4011fd:    89 f3                    mov    ebx,esi
+     4011ff:    48 83 ec 08              sub    rsp,0x8
 
 
-cmov-zero.um
-Tests Conditional Move when condition register contains 0.
-Program loads 'A' and 'B' in registers, uses zero condition
-register, outputs the destination register. B/c the
-condition is zero, the move shouldn’t happen, so expected output
-is "A".
+     —---------------- leaving run_instruction loop —--------------------
+     40125b:    5b                       pop    rbx
+     40125c:    5d                       pop    rbp
+     40125d:    41 5c                    pop    r12
+     40125f:    41 5d                    pop    r13
+     401261:    41 5e                    pop    r14
+     401263:    41 5f                    pop    r15
+     401265:    c3                       ret    
+     Walk through of assembly: 
+     These assembly lines are the start and finish of the run_instruction loop. They show the redundant cost of entering and leaving the function, and the changes to the registers necessary to do so. Because run_instruction is called once per UM instruction, this overhead is done on each word.
+     What we changed:
+     Moving the instructions into UM_run removed the function-call overhead from run_instruction where we had to load and unload registers repeatedly and unnecessarily. Including the repeated commands shown in assembly here. The machine still must decode each opcode, but it no longer pays for entering and leaving a separate dispatch function on every instruction. We can now store local variables that store the memory location and indexes that we are constantly accessing.
 
 
-cmov-nonzero.um
-Tests Conditional Move when condition register is !=0. The
-program loads 'A' and 'B' into registers, uses nonzero condition
-register, performs conditional move, outputs the destination
-register. Because nonzero, the move should happen, so
-expected output is "B".
-
-
-mult-six.um
-Tests Multiplication, Load Value, Add, Output. The program
-multiplies 3 by 2 to get 6, adds 48 to convert it to the ASCII code
-for '6', outputs that character, and halts. Expected output is "6".
-Also known as 54 in ascii.
-
-
-div-four.um
-Tests Division, Load Value, Add, Output. The program divides
-8 / 2 = 4, adds 48 to convert it to the ascii code for '4',
-outputs that character, and halts. Expected output is "4".
-
-
-nand-zero.um
-Tests Bitwise NAND, Output, Halt. The program chooses values so
-that low byte of NAND result is 48, which is the ascii code
-for '0'. It outputs this character. Expected output is "0".
-
-
-seg-store-load-zero.um
-Tests seg store and seg load on seg 0. Program stores 'Z' 
-into already-used location in segment 0,then loads value 
-back from that same location, outputs it. Expected output "Z".
-
-
-map-store-load-unmap.um
-Tests map seg, seg store, seg load, unmap seg, output, halt. 
-Program maps a new segment of length 1, stores 'M' into offset 
-0 of that mapped segment, loads the value back, outputs it, 
-unmaps the segment, and halts. Expected output is "M".
-
-
-loadval-six.um
- Tests load value, output, and halt. Program loads the value 54,
- which is the ASCII code for '6', into a register, outputs it,
- and then halts. Expected output is "6".
+Analysis/Solution Hours:
+        Analysis: 8 hours
+        Solution: 6 hours
