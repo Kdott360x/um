@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-
+# THESE ARE OUR BENCHMARK TESTS
+# THEY INCLUDE A SMALL MEDIUM AND LARGE TEST
+# SMALL - midmark.um
+# MEDIUM - advent.ums < adventureScript.txt , this is the adventure game with the script from the spec
+# LARGE - sandmark.umz
 set -e
 
 echo "=============================="
