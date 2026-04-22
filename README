@@ -7,8 +7,10 @@ Acknowledgements of help:  Did not receive help from office hours but we did get
 Assembly Analysis: 
      Run_function is currently the hottest memory cost.
      Why?
-     Run_instruction is called on each command word. This leads to having to load and unload registers for every single time we want to perform an operation.
-     This code runs for each word and handles the loading and unloading of the registers. This appears to be expensive as there are a lot of commands.
+          Run_instruction is called on each command word. This leads to having to load and unload registers 
+          for every single time we want to perform an operation. This code runs for each word and handles the loading 
+          and unloading of the registers. This appears to be expensive as there are a lot of commands.
+
      RUN_INSTRUCTION C CODE:
      bool run_instruction(UM_T um, uint32_t instruction)
      {
@@ -90,11 +92,25 @@ Assembly Analysis:
 
           return true;
      }
+
      Explanation of C code: 
-     The code begins by asserting that our um object is non-null. Next, we get the opcode for the command (using bitpacking in a helper function) inside the uint32 word. If the command is the load val command, we run this special instance using an if statement, and we continue to the next iteration of the while loop. 
-     If the command is not the load value command, the if statement is skipped, and we get the indexes of the three registers we will be using through bitpacking of the word command. We then perform each command using a helper function, and the appropriate values of the um are all updated in the helper functions. 
-     Each command returns true. If the opcode is 7, the run_instruction command returns false, and this signals for the program loop to end in the um_run function, and it ceases the program immediately.
-     A big picture takeaway from this c code is that we continuously use helper functions and pass in parameters to these helper functions. We expect this to continually load and unload registers which over the long run will be expensive. Another thing to note is that we repeatedly access the um->regs pointer. It would be faster to store this as a local variable, however, because we are in a separate file and looping through an individual command and passing in the entire UM, this becomes an issue. It would be faster to run this loop where we could store a local variable that stores um->regs as a local pointer variable. In other words run this loop directly in um.c.
+          The code begins by asserting that our um object is non-null. Next, we get the opcode for the command 
+          (using bitpacking in a helper function) inside the uint32 word. If the command is the load val command, 
+          we run this special instance using an if statement, and we continue to the next iteration of the while loop.
+          If the command is not the load value command, the if statement is skipped, and we get the indexes of the 
+          three registers we will be using through bitpacking of the word command. We then perform each command using 
+          a helper function, and the appropriate values of the um are all updated in the helper functions. 
+          Each command returns true. If the opcode is 7, the run_instruction command returns false, and this signals 
+          for the program loop to end in the um_run function, and it ceases the program immediately.
+          A big picture takeaway from this c code is that we continuously use helper functions and pass 
+          in parameters to these helper functions. We expect this to continually load and unload registers 
+          which over the long run will be expensive. Another thing to note is that we repeatedly access the 
+          um->regs pointer. It would be faster to store this as a local variable, however, because we are in a 
+          separate file and looping through an individual command and passing in the entire UM, this becomes an 
+          issue. It would be faster to run this loop where we could store a local variable that stores um->regs 
+          as a local pointer variable. In other words run this loop directly in um.c.
+
+
      RUN_INSTRUCTION ASSEMBLY CODE:
      —---------------- entering run_instruction loop —--------------------
      4011f0:    41 57                    push   r15
@@ -116,10 +132,18 @@ Assembly Analysis:
      401261:    41 5e                    pop    r14
      401263:    41 5f                    pop    r15
      401265:    c3                       ret    
+
      Walk through of assembly: 
-     These assembly lines are the start and finish of the run_instruction loop. They show the redundant cost of entering and leaving the function, and the changes to the registers necessary to do so. Because run_instruction is called once per UM instruction, this overhead is done on each word.
+          These assembly lines are the start and finish of the run_instruction loop. They show the redundant 
+          cost of entering and leaving the function, and the changes to the registers necessary to do so. 
+          Because run_instruction is called once per UM instruction, this overhead is done on each word.
+
      What we changed:
-     Moving the instructions into UM_run removed the function-call overhead from run_instruction where we had to load and unload registers repeatedly and unnecessarily. Including the repeated commands shown in assembly here. The machine still must decode each opcode, but it no longer pays for entering and leaving a separate dispatch function on every instruction. We can now store local variables that store the memory location and indexes that we are constantly accessing.
+          Moving the instructions into UM_run removed the function-call overhead from run_instruction 
+          where we had to load and unload registers repeatedly and unnecessarily. Including the repeated 
+          commands shown in assembly here. The machine still must decode each opcode, but it no longer pays 
+          for entering and leaving a separate dispatch function on every instruction. We can now store local 
+          variables that store the memory location and indexes that we are constantly accessing.
 
 
 Analysis/Solution Hours:
